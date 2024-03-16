@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Menu</title>
+    <link rel="stylesheet" href="/static/login.css">
+</head>
+<body>
+    <div class="login-box">
+        <h2>Add Item</h2>
+        <form id="menuForm" action="#">
+            <div class="user-box">
+                <input type="text" name="category" required="">
+                <label>Enter Category</label>
+            </div>
+            <div class="user-box">
+                <input type="text" name="item" required="">
+                <label>Enter Item Name</label>
+            </div>
+            <div class="user-box">
+                <input type="number" name="eta" required="">
+                <label>Enter ETA</label>
+            </div>
+            <button type="submit" id="addToMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                Add to the menu
+            </button>
+        </form>
+    </div>
+
+    <div class="activity">
+        <!-- This is where the menu items will be displayed dynamically -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to update the dashboard with menu items
+            function updateDashboard() {
+                const activity = document.querySelector('.activity');
+                activity.innerHTML = ''; // Clear existing content
+                menuItems.forEach(menuItem => {
+                    const activityData = document.createElement('div');
+                    activityData.classList.add('activity-data');
+                    activityData.innerHTML = `
+                        <div class="data">
+                            <span class="data-list">${menuItem.category}</span>
+                        </div>
+                        <div class="data">
+                            <span class="data-list">${menuItem.item}</span>
+                        </div>
+                        <div class="data">
+                            <span class="data-list">${menuItem.eta}</span>
+                        </div>
+                        <div class="data">
+                            <!-- Add delete button for each row -->
+                            <form class="delete-form">
+                                <input type="hidden" name="index" value="${menuItems.indexOf(menuItem)}">
+                                <button type="button" class="delete-btn">Delete</button>
+                            </form>
+                        </div>
+                    `;
+                    activity.appendChild(activityData);
+                });
+            }
+
+            // Load menu items from local storage on page load
+            let menuItems = [];
+            const storedMenuItems = localStorage.getItem('menuItems');
+            if (storedMenuItems) {
+                menuItems = JSON.parse(storedMenuItems);
+            }
+
+            // Update dashboard only if not on the menu page
+            const currentPage = window.location.pathname;
+            if (currentPage !== '/route/menu') {
+                updateDashboard();
+            }
+
+            // Form submission handling
+            document.getElementById('menuForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent form submission
+
+                const category = document.querySelector('input[name="category"]').value;
+                const item = document.querySelector('input[name="item"]').value;
+                const eta = document.querySelector('input[name="eta"]').value;
+
+                if (!category.trim() || !item.trim() || !eta.trim()) {
+                    alert("Please fill all the fields.");
+                    return;
+                }
+
+                const newMenuItem = { category, item, eta };
+                menuItems.push(newMenuItem); // Add new item to the menuItems array
+
+                // Update local storage
+                localStorage.setItem('menuItems', JSON.stringify(menuItems));
+
+                // Redirect to the dashboard page
+                window.location.href = "/route/dashboard";
+            });
+
+            // Delete button functionality
+            document.addEventListener('click', function (event) {
+                if (event.target.classList.contains('delete-btn')) {
+                    const form = event.target.closest('.delete-form');
+                    const index = parseInt(form.querySelector('input[name="index"]').value);
+                    menuItems.splice(index, 1); // Remove item from menuItems array
+
+                    // Update local storage
+                    localStorage.setItem('menuItems', JSON.stringify(menuItems));
+
+                    // Update dashboard display
+                    updateDashboard();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

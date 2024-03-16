@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel=stylesheet href="/static/dashboard.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    
+</head>
+
+<body>
+    <nav>
+        <div class="logo-name">
+            <div class="logo-image">
+               <img src="https://png.pngtree.com/png-clipart/20220903/ourmid/pngtree-chef-restaurant-logo-png-image_6136204.png" alt="">
+            </div>
+
+            <span class="logo_name">RashiEats</span>
+        </div>
+
+        <div class="menu-items">
+            <ul class="nav-links">
+                <li><a href="#">
+                    <i class="uil uil-estate"></i>
+                    <span class="link-name">Dashboard</span>
+                </a></li>
+                <li><a href="/route/menu">
+                    <i class="uil uil-files-landscapes"></i>
+                    <span class="link-name">Add Menu</span>
+                </a></li>
+                <li><a href="#">
+                    <i class="uil uil-chart"></i>
+                    <span class="link-name">Orders</span>
+                </a></li>
+                <li><a href="#">
+                    <i class="uil uil-thumbs-up"></i>
+                    <span class="link-name">Services</span>
+                </a></li>
+                <li><a href="#">
+                    <i class="uil uil-comments"></i>
+                    <span class="link-name">Contact Us</span>
+                </a></li>
+                <li><a href="#">
+                    <i class="uil uil-share"></i>
+                    <span class="link-name">Help</span>
+                </a></li>
+            </ul>
+            
+            <ul class="logout-mode">
+                <li><a href="/route/login">
+                    <i class="uil uil-signout"></i>
+                    <span class="link-name">Logout</span>
+                </a></li>
+
+                <li class="mode">
+                    <a href="#">
+                        <i class="uil uil-moon"></i>
+                    <span class="link-name">Dark Mode</span>
+                </a>
+
+                <div class="mode-toggle">
+                  <span class="switch"></span>
+                </div>
+            </li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="dashboard">
+        <div class="top">
+            <i class="uil uil-bars sidebar-toggle"></i>
+
+            <div class="search-box">
+                <i class="uil uil-search"></i>
+                <input type="text" placeholder="Search here...">
+            </div>
+            
+            <!--<img src="images/profile.jpg" alt="">-->
+        </div>
+
+        <div class="dash-content">
+            <div class="overview">
+                <div class="title">
+                    <i class="uil uil-tachometer-fast-alt"></i>
+                    <span class="text">Dashboard</span>
+                </div>
+
+
+                <div class="activity">
+                    <!-- Menu headings -->
+                    <div class="activity-data headings">
+                        <div class="data">
+                            <span class="data-title">Category:</span>
+                        </div>
+                        <div class="data">
+                            <span class="data-title">Item Name:</span>
+                        </div>
+                        <div class="data">
+                            <span class="data-title">ETA:</span>
+                        </div>
+                        <div class="data">
+                            <span class="data-title">Edit:</span>
+                        </div>
+                    </div>
+                
+                    <!-- Menu Items -->
+                    <% menuItems.forEach(function(menuItem, index) { %>
+                        <div class="activity-data">
+                            <div class="data">
+                                <span class="data-list"><%= menuItem.category %></span>
+                            </div>
+                            <div class="data">
+                                <span class="data-list"><%= menuItem.item %></span>
+                            </div>
+                            <div class="data">
+                                <span class="data-list"><%= menuItem.eta %></span>
+                            </div>
+                            <div class="data">
+                                <!-- Add delete button for each row -->
+                                <form class="delete-form">
+                                    <input type="hidden" name="index" value="<%= index %>"> <!-- Use menu item index as identifier -->
+                                    <button type="button" class="delete-btn">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+                
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to update the dashboard with menu items
+            function updateDashboard(menuItems) {
+                const activity = document.querySelector('.activity');
+                activity.innerHTML = ''; // Clear existing content
+                menuItems.forEach(menuItem => {
+                    const activityData = document.createElement('div');
+                    activityData.classList.add('activity-data');
+                    activityData.innerHTML = `
+                        <div class="data">
+                            <span class="data-list">${menuItem.category}</span>
+                        </div>
+                        <div class="data">
+                            <span class="data-list">${menuItem.item}</span>
+                        </div>
+                        <div class="data">
+                            <span class="data-list">${menuItem.eta}</span>
+                        </div>
+                        <div class="data">
+                            <!-- Add delete button for each row -->
+                            <button type="button" class="delete-btn">Delete</button>
+                        </div>
+                    `;
+                    activity.appendChild(activityData);
+                });
+            }
+
+            // Load menu items from local storage on page load
+            const storedMenuItems = localStorage.getItem('menuItems');
+            if (storedMenuItems) {
+                const menuItems = JSON.parse(storedMenuItems);
+                updateDashboard(menuItems);
+            }
+        });
+
+        // Delete button functionality
+        document.addEventListener('click', function (event) {
+            if (event.target.classList.contains('delete-btn')) {
+                const rowToDelete = event.target.closest('.activity-data');
+                rowToDelete.remove(); // Remove row from UI
+
+                // Remove item from local storage
+                const index = Array.from(rowToDelete.parentNode.children).indexOf(rowToDelete);
+                const storedMenuItems = JSON.parse(localStorage.getItem('menuItems'));
+                storedMenuItems.splice(index, 1);
+                localStorage.setItem('menuItems', JSON.stringify(storedMenuItems));
+            }
+        });
+    </script>
+</body>
+</html>
+
+
